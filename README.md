@@ -1,8 +1,14 @@
 # A unit testing framework for OpenFOAM code
 
+This is a unit/integration testing framework to help test-proof new OpenFOAM code (might be too late for the OpenFOAM library
+itself). Master branch works with Foam-Extend 4 (because that's what I'm dealing with mostly, but can be adapted to other forks
+easily).
+
+> See example reports at the bottom!
+
 ## How to use this repository
 
-- Add it to your repo as a submodule or a subtree somewhere under your tests tree
+- Add it to your library repo as a submodule or a subtree somewhere under your tests tree
 ```bash
 git subtree add --prefix tests https://github.com/FoamScience/OpenFOAM-Unit-testing.git master --squash
 ```
@@ -24,12 +30,12 @@ git subtree add --prefix tests https://github.com/FoamScience/OpenFOAM-Unit-test
 ```bash
 tests
 ├── Make                     # Make/files should compile all *C files
-├── testingFramework         # Directory for different *C tests (e.g. a directory per tested class)
+├── serialParallelTests      # Directory for different *C tests (e.g. a directory per tested class)
 ├── testsTestDriver.C        # Test driver for the tested library "tests"
-                             # Resulting binary has to be named ${libName}TestDriver
+                             # Resulting binary has to be named ${libName}TestDriver for the Alltest script to work
 ```
 
-- Try to add a test file to `tests/testingFramework` (and mention in `Make/files`) then run the `Alltest` script.
+- Try to add a test file to `tests/serialParallelTests` (and mention in `Make/files`) then run the `Alltest` script.
 
 ## Design principles
 
@@ -48,7 +54,7 @@ tests
   - `mpirun -np 2 ./TestDriver -p` or `mpirun -np 2 ./TestDriver --parallel` will work for parallel runs.
   - The provided template for the test driver need to be invoked from the case directory (has no support for `-case` flag).
 - The same unit-test case can check for results both in serial and in parallel.
-- Tagging is used to distinguish between serial/parallel tests, and to specify which OpenFOAM case to use to tun the tests.
+- Tagging is used to distinguish between serial/parallel tests, and to specify which OpenFOAM case to use to run the tests.
 - Supported reporters:
     - `stdout` for output at the console (Best for local and CI testing)
     - `compact` for status overview in a single line
@@ -82,7 +88,7 @@ tests
     - But if there is a need to test a private method, use macros defined in `include/memberStealer.H`
 - Use `CAPTURE()` to record useful case parameters (which will show up in reports).
 - **Standard output** is consumed by Catch2, print to standard error to see
-  the logs at the console (Or use `Pout`).
+  the logs at the console (Or use `Pout`), but doing so will mess up report generation.
 - Some convenient macros to create time, mesh and field objects can be found in `include/testMacros.H`
 
 ### Strongly recommended testing guidelines
@@ -206,6 +212,8 @@ with messages:
 
 ## Integration with CI and reporting
 
+> By default, all tests run in memory (`/dev/shm`), change `caseRun` variable in `./Alltest` to your desired path.
+
 You can change the flags passed to the test driver in `Alltest` to suit your needs.
 For example, 
 ```bash
@@ -214,3 +222,7 @@ $root/$lib/${lib}TestDriver -s -r junit -o serialTests.xml "[Serial][Case_$caseN
 ```
 
 `Alltest.report` provides an example of such report generation (with a custom HTML template).
+
+Here is an example HTML report from a parallel test run (produced with `./Alltest.report`:
+
+![file](https://user-images.githubusercontent.com/34474472/186402299-7f3cec00-0572-4a7b-a3f6-60df2e7dd015.svg)
