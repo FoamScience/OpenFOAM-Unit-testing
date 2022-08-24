@@ -1,0 +1,3 @@
+[submodule "tests/testingFramework"]
+	path = tests/testingFramework
+	url = https://github.com/FoamScience/testingFrameworkFE4
