@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Run from this directory
+cd ${0%/*} || exit 1
+
+# Libs to test
+libs="tests"
+# The root dir of tests
+root=$PWD
+# Where to run the tests
+caseRun=/dev/shm/
+
+# Compile catch
+echo "==================="
+echo "Compiling Catch2 v3"
+echo "==================="
+if [ ! -f "$FOAM_USER_LIBBIN/catch2/lib/libCatch2.a" ]; then
+    cd catch2
+    mkdir build
+    cd build
+    cmake -DCMAKE_INSTALL_PREFIX=$FOAM_USER_LIBBIN/catch2 ..
+    make -j$(nproc)
+    make install
+    cd -
+    rm -rf build
+    cd ..
+fi
+
+# 1st testing step:  Compile tests
+for lib in $libs; do
+    cd $lib
+    echo "=========================="
+    echo "Compiling $lib test driver"
+    echo "=========================="
+    if ! wmake > log.wmake 2>&1; then
+        echo "Errors compiling $lib test driver, see $PWD/log.wmake for more information"
+        exit 1
+    else
+        echo "$lib test driver compiled."
+    fi
+    cd -
+done
+
+# Make sure we're back at the root dir
+cd $root
+
+# Run tests on desired cases per test
+cases=$(ls -1d cases/*)
+mkdir -p $root/reports
+err=0
+for ofCase in $cases; do
+    caseName=$(basename $ofCase)
+    echo "=========================="
+    echo "Running tests for $caseName "
+    echo "=========================="
+    cp -r $ofCase $caseRun
+    cd "$caseRun/$caseName"
+    decomposePar -force > log.decomposePar
+    # Run serial case
+    for lib in $libs; do
+        $root/$lib/${lib}TestDriver  -s -r xml -o ${lib}_serialTests.xml "[Serial][Case_$caseName]"
+        xsltproc $root/style/catch2HTML.xslt ${lib}_serialTests.xml  > $root/reports/${caseName}_${lib}_serial.html
+    done
+    # Run serial case
+    for lib in $libs; do
+        mpirun -np 2  --output-filename ${lib}_parallelTests.xml $root/$lib/${lib}TestDriver -p -s -r xml "[Parallel][Case_$caseName]"
+        xsltproc $root/style/catch2HTML.xslt ${lib}_parallelTests.xml.1.0  > $root/reports/${caseName}_${lib}_parallel.1.0.html
+        xsltproc $root/style/catch2HTML.xslt ${lib}_parallelTests.xml.1.1  > $root/reports/${caseName}_${lib}_parallel.1.1.html
+    done
+    cd -
+    rm -rf "$caseRun/caseName"
+done
