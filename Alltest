@@ -9,6 +9,8 @@ libs="tests"
 root=$PWD
 # Where to run the tests
 caseRun=/dev/shm/
+# Test Timeout value
+tout="${CATCH_TIMEOUT:-15}"
 
 # Compile catch
 echo "==================="
@@ -38,7 +40,7 @@ for lib in $libs; do
     else
         echo "$lib test driver compiled."
     fi
-    cd -
+    cd - > /dev/null
 done
 
 # Make sure we're back at the root dir
@@ -58,12 +60,12 @@ for ofCase in $cases; do
     decomposePar -force > log.decomposePar
     # Run serial case
     for lib in $libs; do
-        $root/$lib/${lib}TestDriver -s "[Serial][Case_$caseName]"
+        $root/$lib/${lib}TestDriver "[Serial][Case_$caseName]"
     done
     # Run serial case
     for lib in $libs; do
-        mpirun -np 2 $root/$lib/${lib}TestDriver -p -s "[Parallel][Case_$caseName]"
+        timeout $tout mpirun -np 2 $root/$lib/${lib}TestDriver -p "[Parallel][Case_$caseName]"
     done
-    cd -
+    cd - > /dev/null
     rm -rf "$caseRun/caseName"
 done
