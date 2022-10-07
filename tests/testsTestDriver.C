@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     {
         // OK, init MPI comms if a parallel run,
         // but this is not enough, need to point time to the correct processor path
-        Foam::Pstream::init(argc,argv);
+        Foam::Pstream::init(argc,argv, 0);
     }
 
     // Run tests and return error code
