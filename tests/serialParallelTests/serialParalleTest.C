@@ -41,7 +41,7 @@ prepareTimePaths();
 TEST_CASE
 (
     "Support for serial and parallel runs",
-    "[Serial][Parallel][Case_damBreak]"
+    "[Serial][Parallel][Case_cavity]"
 )
 {
     // Turn this on if you want to see FATAL ERROR msgs
@@ -100,7 +100,7 @@ TEST_CASE
     }
 
     // Do not forget to clear the mesh every time!
-    meshPtr->clear();
+    meshPtr.clear();
 }
 
 #include "undefineTestMacros.H"
