@@ -24,10 +24,10 @@ Notes
 // Create Sample Time object with no function objects
 Time TIME_NAME
 (
-        Foam::Time::controlDictName,
+        word(Foam::Time::controlDictName),
         ROOT_CASEPATH,
         ROOT_CASENAME,
-        "system",
-        "constant",
+        word("system"),
+        word("constant"),
         false
 );
