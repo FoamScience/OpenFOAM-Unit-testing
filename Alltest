@@ -62,9 +62,10 @@ for ofCase in $cases; do
     for lib in $libs; do
         $root/$lib/${lib}TestDriver "[Serial][Case_$caseName]"
     done
+    nProcs=$(grep -oP "numberOfSubdomains\s+\K\d+" system/decomposeParDict)
     # Run serial case
     for lib in $libs; do
-        timeout $tout mpirun -np 2 $root/$lib/${lib}TestDriver -p "[Parallel][Case_$caseName]"
+        timeout $tout mpirun -np $nProcs $root/$lib/${lib}TestDriver -p "[Parallel][Case_$caseName]"
     done
     cd - > /dev/null
     rm -rf "$caseRun/caseName"
