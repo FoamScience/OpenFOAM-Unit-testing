@@ -1,14 +1,17 @@
 # A unit testing framework for OpenFOAM code
 
 This is a unit/integration testing framework to help test-proof new OpenFOAM code (might be too late for the OpenFOAM library
-itself). Master branch works with Foam-Extend 4 (because that's what I'm dealing with mostly, but can be adapted to other forks
-easily).
+itself). Master branch works with Foam-Extend 5 (because that's what I'm dealing with mostly) but the framework supports other
+forks through different branches:
+- `fe5` works with Foam-Extend 5.0
+- `of10` works with Foundation OpenFOAM v10 (May also work with earlier versions)
+- `of2206` works with ESI OpenCFD's OpenFOAM v2206 (May also workwith earlier versions)
 
 > See example reports at the bottom!
 
 ## How to use this repository
 
-- Add it to your library repo as a submodule or a subtree somewhere under your tests tree
+- Add it to your library repo as a sub-module or a sub-tree somewhere under your tests tree
 ```bash
 git subtree add --prefix tests https://github.com/FoamScience/OpenFOAM-Unit-testing.git master --squash
 ```
@@ -137,7 +140,7 @@ tests
         auto& mesh = meshPtr();
 
         // Do what's needed, and
-        meshPtr->clear();
+        meshPtr.clear();
    }
    ```
 > Global pointers are hated for a resounding reason;
