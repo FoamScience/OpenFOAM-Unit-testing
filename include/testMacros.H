@@ -22,13 +22,13 @@ Notes
 
 // Specialize the member stealer for case and processorCase
 #define prepareTimePaths()                                          \
-   SPECIALIZE_MEMBER_STEALER(globalCaseName_, fileName, TimePaths);           \
+   SPECIALIZE_MEMBER_STEALER(case_, fileName, TimePaths);           \
    SPECIALIZE_MEMBER_STEALER(processorCase_, bool, TimePaths)
 
 // Reset time case name and processorCase
 #define modifyTimePaths(timeName, newProcessorCase, newCaseName)    \
     GET_REF(processorCase_, TimePaths, timeName) = newProcessorCase;\
-    GET_REF(globalCaseName_, TimePaths, timeName) = newCaseName
+    GET_REF(case_, TimePaths, timeName) = newCaseName
 
 // 2 Mesh-related macros
 
