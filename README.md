@@ -1,11 +1,10 @@
 # A unit testing framework for OpenFOAM code
 
 This is a unit/integration testing framework to help test-proof new OpenFOAM code (might be too late for the OpenFOAM library
-itself). Master branch works with Foam-Extend 5 (because that's what I'm dealing with mostly) but the framework supports other
+itself). Master branch works with Foam-Extend 5 (because that's what I'm dealing with mostly) but the framework supports ESI
 forks through different branches:
 - `fe5` works with Foam-Extend 5.0
-- `of10` works with Foundation OpenFOAM v10 (May also work with earlier versions)
-- `of2206` works with ESI OpenCFD's OpenFOAM v2206 (May also workwith earlier versions)
+- `of2206` works with ESI OpenCFD's OpenFOAM v2206 (May also work with earlier versions)
 
 > See example reports at the bottom!
 
