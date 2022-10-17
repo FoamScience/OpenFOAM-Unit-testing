@@ -38,7 +38,7 @@ for lib in $libs; do
     else
         echo "$lib test driver compiled."
     fi
-    cd -
+    cd - > /dev/null
 done
 
 # Make sure we're back at the root dir
@@ -58,15 +58,18 @@ for ofCase in $cases; do
     decomposePar -force > log.decomposePar
     # Run serial case
     for lib in $libs; do
-        $root/$lib/${lib}TestDriver  -s -r xml -o ${lib}_serialTests.xml "[Serial][Case_$caseName]"
-        xsltproc $root/style/catch2HTML.xslt ${lib}_serialTests.xml  > $root/reports/${caseName}_${lib}_serial.html
+        $root/$lib/${lib}TestDriver -d yes -s -r xml -o ${lib}SerialTests.xml "[Serial][Case_$caseName]"
+        xsltproc $root/style/catch2HTML.xslt ${lib}SerialTests.xml  > $root/reports/${caseName}_${lib}_serial.html
     done
-    # Run serial case
+    # Run parallel case
+    nProcs=$(grep -oP "numberOfSubdomains\s+\K\d+" system/decomposeParDict)
+    ((nLast=nProcs-1))
     for lib in $libs; do
-        mpirun -np 2  --output-filename ${lib}_parallelTests.xml $root/$lib/${lib}TestDriver -p -s -r xml "[Parallel][Case_$caseName]"
-        xsltproc $root/style/catch2HTML.xslt ${lib}_parallelTests.xml.1.0  > $root/reports/${caseName}_${lib}_parallel.1.0.html
-        xsltproc $root/style/catch2HTML.xslt ${lib}_parallelTests.xml.1.1  > $root/reports/${caseName}_${lib}_parallel.1.1.html
+        mpirun -np $nProcs  --output-filename ${lib}ParallelTests.xml $root/$lib/${lib}TestDriver -d yes -p --rng-seed time -s -r xml "[Parallel][Case_$caseName]"
+        for i in $(seq 0 $nLast); do
+            xsltproc $root/style/catch2HTML.xslt ${lib}ParallelTests.xml/1/rank.$i/stdout  > $root/reports/${caseName}_${lib}_parallel.1.$i.html
+        done
     done
-    cd -
-    rm -rf "$caseRun/caseName"
+    cd - > /dev/null
+    rm -rf "$caseRun/$caseName"
 done
