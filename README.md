@@ -1,3 +1,5 @@
+> :warning: This is also deprecated!!! use [foamUT](https://github.com/FoamScience/foamUT) instead :warning:
+
 # A unit testing framework for OpenFOAM code
 
 This is a unit/integration testing framework to help test-proof new OpenFOAM code (might be too late for the OpenFOAM library
